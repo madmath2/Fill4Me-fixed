@@ -175,7 +175,6 @@ function fill4me.load_ammo(entity, lent, plidx)
 				if count > 0 then
 					fill4me.loadInto(entity, ammo.name, count)
 					fill4me.textRemove(player, entity, ammo.i18n, count)
-					found_fuel = true
 					break
 				end
 			end
@@ -188,7 +187,6 @@ function fill4me.load_ammo(entity, lent, plidx)
 				if count > 0 then
 					fill4me.loadInto(entity, ammo.name, count)
 					fill4me.textRemove(player, entity, ammo.i18n, count)
-					found_fuel = true
 					break
 				end
 			end
@@ -231,6 +229,12 @@ function fill4me.player(plidx)
 	return global.fill4me.players[plidx]
 end
 
+function fill4me.script_built_entity(event)
+	if event.created_entity and event.player_index then
+		fill4me.built_entity(event)
+	end
+end
+
 function fill4me.textRemove(player, entity, item_name, quantity, color)
 	local pos = entity.position
 	local pldata = fill4me.player(player.index)
@@ -262,5 +266,6 @@ function fill4me.toggle(plidx)
 end
 
 Event.register(Event.core_events.configuration_changed, fill4me.reInitMod)
-Event.register(defines.events.on_player_joined_game, fill4me.initMod)
+Event.register(Event.def("softmod_init"), fill4me.initMod)
 Event.register(defines.events.on_built_entity, fill4me.built_entity)
+Event.register(defines.events.script_raised_built, fill4me.script_built_entity)

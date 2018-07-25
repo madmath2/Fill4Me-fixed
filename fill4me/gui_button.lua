@@ -35,8 +35,17 @@ Adds a gui button to enable/disable Fill4Me.
 
 fill4me_gui = {}
 
+function fill4me_gui.addinCreateButton(event)
+	-- This is primarily here to create the button if this mod is added to an
+	-- existing game.
+	if game and game.players then
+		for idx, player in pairs(game.players) do
+			fill4me_gui.drawButton(player)
+		end
+	end
+end
+
 -- Button for disabling/enabling autofill
--- Event to create the button.
 function fill4me_gui.drawButton(player)
 	kw_newToolbarButton(player, "btn_toolbar_fill4me", {'fill4me.gui.enable_btn'}, {'fill4me.gui.enable_tooltip'}, 'item/uranium-rounds-magazine', fill4me_gui.toggle)
 end
@@ -51,4 +60,6 @@ function fill4me_gui.onJoinDoButton(event)
 	fill4me_gui.drawButton(player)
 end
 
+-- Event to create the button.
+Event.register(Event.def("softmod_init"), fill4me_gui.addinCreateButton)
 Event.register(defines.events.on_player_joined_game, fill4me_gui.onJoinDoButton)
