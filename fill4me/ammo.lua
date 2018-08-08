@@ -51,9 +51,9 @@ function Ammo.list()
 	for _, proto in pairs(game.item_prototypes) do
 		-- evaluate ammunition items
 		local ammotype = proto.get_ammo_type()
-		if ammotype then
-			local damage = Ammo.damage_from_actions(proto.get_ammo_type().action)
-			local radius = Ammo.radius_from_actions(proto.get_ammo_type().action)
+		if ammotype and ammotype.action then
+			local damage = Ammo.damage_from_actions(ammotype.action)
+			local radius = Ammo.radius_from_actions(ammotype.action)
 			local data = {
 				name = proto.name,
 				category = ammotype.category,
@@ -64,6 +64,8 @@ function Ammo.list()
 				radius = radius,
 			}
 			table.insert(ammolist, data)
+		elseif ammotype then
+			log("Warning: Ammotype without action: " .. serpent.block(ammotype))
 		end
 	end
 	return ammolist
