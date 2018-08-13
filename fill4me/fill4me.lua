@@ -173,8 +173,13 @@ function fill4me.load_ammo(entity, lent, plidx)
 			else
 				local count = fill4me.getFromInventory(player, ammo.name, ammo.max_size)
 				if count > 0 then
-					fill4me.loadInto(entity, ammo.name, count)
-					fill4me.textRemove(player, entity, ammo.i18n, count)
+					local loaded = fill4me.loadAmmoInto(entity, ammo.name, count)
+					if loaded > 0 then
+						fill4me.textRemove(player, entity, ammo.i18n, loaded)
+					end
+					if loaded < count then
+						fill4me.loadInto(player, ammo.name, count - loaded)
+					end
 					break
 				end
 			end
@@ -185,8 +190,13 @@ function fill4me.load_ammo(entity, lent, plidx)
 			for _, ammo in pairs(global.fill4me.ammos[gun.ammo_category]) do
 				local count = fill4me.getFromInventory(player, ammo.name, ammo.max_size)
 				if count > 0 then
-					fill4me.loadInto(entity, ammo.name, count)
-					fill4me.textRemove(player, entity, ammo.i18n, count)
+					local loaded = fill4me.loadAmmoInto(entity, ammo.name, count)
+					if loaded > 0 then
+						fill4me.textRemove(player, entity, ammo.i18n, loaded)
+					end
+					if loaded < count then
+						fill4me.loadInto(player, ammo.name, count - loaded)
+					end
 					break
 				end
 			end
@@ -202,8 +212,13 @@ function fill4me.load_fuel(entity, lent, plidx)
 		for _, fuel in pairs(global.fill4me.fuels[name]) do
 			local count = fill4me.getFromInventory(player, fuel.name, fuel.max_size)
 			if count > 0 then
-				fill4me.loadInto(entity, fuel.name, count)
-				fill4me.textRemove(player, entity, fuel.i18n, count)
+				loaded = fill4me.loadFuelInto(entity, fuel.name, count)
+				if loaded > 0 then
+					fill4me.textRemove(player, entity, fuel.i18n, loaded)
+				end
+				if loaded < count then
+					fill4me.loadInto(player, fuel.name, count - loaded)
+				end
 				found_fuel = true
 				break
 			end
@@ -214,8 +229,31 @@ function fill4me.load_fuel(entity, lent, plidx)
 	end
 end
 
+function fill4me.loadAmmoInto(entity, item_name, quantity)
+	-- try both car & turret inventories.
+	local inv = entity.get_inventory(defines.inventory.car_ammo)
+	local itemstack = { name = item_name, count = quantity }
+	if not (inv and inv.valid) then
+		inv = entity.get_inventory(defines.inventory.turret_ammo)
+	end
+	if inv and inv.valid and inv.can_insert(itemstack) then
+		return inv.insert(itemstack)
+	end
+	return 0
+end
+
+function fill4me.loadFuelInto(entity, item_name, quantity)
+	local inv = entity.get_inventory(defines.inventory.fuel)
+	local itemstack = { name = item_name, count = quantity }
+	if inv and inv.valid and inv.can_insert(itemstack) then
+		return inv.insert(itemstack)
+	end
+	return 0
+end
+
 function fill4me.loadInto(entity, item_name, quantity)
-	entity.insert({ name = item_name, count = quantity })
+	local itemstack = { name = item_name, count = quantity }
+	return entity.insert(itemstack)
 end
 
 function fill4me.player(plidx)
@@ -231,7 +269,9 @@ end
 
 function fill4me.script_built_entity(event)
 	if event.created_entity and event.player_index then
-		fill4me.built_entity(event)
+		-- Work around scripts which dispatch a script event and THEN
+		-- insert fuel/ammo into the entity of interest.
+		Event.on_next_tick(fill4me.built_entity, event)
 	end
 end
 

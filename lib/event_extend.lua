@@ -56,10 +56,11 @@ end
 
 local mod_rel = 1
 
-function event_softmod_init()
+function event_softmod_init(event)
 	if not global.softmod_cur then
 		global.softmod_cur = 0
 		global.mod_rel = mod_rel
+		global.kevents = { on_next_tick = {} }
 	end
 	if global.softmod_cur < global.mod_rel then
 		global.softmod_cur = global.mod_rel
@@ -67,13 +68,31 @@ function event_softmod_init()
 	end
 end
 
-Event.register(
-	{
-		Event.core_events.init,
-		defines.events.on_player_joined_game,
-		defines.events.on_player_created,
-	}, 
-	function(event)
-		event_softmod_init()
+function event_on_next_tick(event)
+	if global.kevents and #global.kevents.on_next_tick > 0 then
+		-- clone and wipe the on_next_tick list, in case we generate a new
+		-- `on_next_tick` event.
+		local events = table.deepcopy(global.kevents.on_next_tick)
+		global.kevents.on_next_tick = {}
+		for _, event in pairs(events) do
+			if event.func and type(event.func) == "function" then
+				event.func(event.params)
+			end
+		end
 	end
-)
+end
+
+function Event.on_next_tick(in_func, in_params)
+	table.insert(global.kevents.on_next_tick, {
+		func = in_func,
+		params = in_params,
+	})
+end
+
+Event.register({
+	Event.core_events.init,
+	defines.events.on_player_joined_game,
+	defines.events.on_player_created,
+}, event_softmod_init)
+
+Event.register(defines.events.on_tick, event_on_next_tick)
