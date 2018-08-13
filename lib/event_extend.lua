@@ -60,7 +60,12 @@ function event_softmod_init(event)
 	if not global.softmod_cur then
 		global.softmod_cur = 0
 		global.mod_rel = mod_rel
-		global.kevents = { on_next_tick = {} }
+	end
+	if not global.kevents then
+		global.kevents = {}
+	end
+	if not global.kevents.on_next_tick then
+		global.kevents.on_next_tick = {}
 	end
 	if global.softmod_cur < global.mod_rel then
 		global.softmod_cur = global.mod_rel
@@ -93,6 +98,7 @@ Event.register({
 	Event.core_events.init,
 	defines.events.on_player_joined_game,
 	defines.events.on_player_created,
+	Event.core_events.configuration_changed,
 }, event_softmod_init)
 
 Event.register(defines.events.on_tick, event_on_next_tick)
