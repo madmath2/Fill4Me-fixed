@@ -81,7 +81,7 @@ end
 -- Entity built by player.  Evaluate for inserting fuel & ammo.
 function fill4me.built_entity(event)
 	local pldata = fill4me.player(event.player_index)
-	if pldata.enable then
+	if pldata.enable and event.created_entity.valid then
 		pldata.ft_offset = 0
 		local entity = event.created_entity
 		local lent = global.fill4me.loadable_entities[entity.name]
