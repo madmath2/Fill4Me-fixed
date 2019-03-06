@@ -47,7 +47,11 @@ end
 
 -- Button for disabling/enabling autofill
 function fill4me_gui.drawButton(player)
-	kw_newToolbarButton(player, "btn_toolbar_fill4me", {'fill4me.gui.enable_btn'}, {'fill4me.gui.enable_tooltip'}, 'item/uranium-rounds-magazine', fill4me_gui.toggle)
+	-- Check for the setting 'fill4me-gui-show-button' and if it's true.
+	local setting = settings.get_player_settings(player)["fill4me-show-gui-button"]
+	if not setting or setting.value == true then
+		kw_newToolbarButton(player, "btn_toolbar_fill4me", {'fill4me.gui.enable_btn'}, {'fill4me.gui.enable_tooltip'}, 'item/uranium-rounds-magazine', fill4me_gui.toggle)
+	end
 end
 
 function fill4me_gui.toggle(event)
