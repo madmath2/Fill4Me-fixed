@@ -1,0 +1,13 @@
+--------------------------------------------------------------------------------
+Version: 0.5.0
+Date: Mar 5, 2019
+Changes:
+  - Added mod global settings to tell Fill4Me to only use ammos or fuels up to a certain value.
+  - - This is particular useful for fuels, as it allows you to specify 100000000 (100 million) for fuels, and the highest level fuel that it will auto-insert will be Rocket Fuel (which has a value of 100million)
+
+--------------------------------------------------------------------------------
+Version: 0.4.4
+Date: Mar 5, 2019
+Changes:
+  - Added mod player setting to hide the Fill4Me enable/disable button.
+--------------------------------------------------------------------------------

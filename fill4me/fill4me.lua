@@ -59,6 +59,10 @@ function fill4me.initMod(event)
 	if not global.fill4me then
 		global.fill4me = {
 			initialized = false,
+			maximum_values = {
+				fuel = 0,
+				ammo = 0,
+			},
 			fuels = {},
 			ammos = {},
 			loadable_entities = {},
@@ -66,6 +70,7 @@ function fill4me.initMod(event)
 		}
 	end
 	if not global.fill4me.initialized then
+		fill4me.loadModSettings()
 		fill4me.evaluate_items()
 		fill4me.evaluate_entities()
 		global.fill4me.initialized = true
@@ -84,7 +89,7 @@ function fill4me.built_entity(event)
 	if pldata.enable and event.created_entity.valid then
 		pldata.ft_offset = 0
 		local entity = event.created_entity
-		local lent = global.fill4me.loadable_entities[entity.name]
+		local lent = fill4me.for_player(pldata, "loadable_entities")[entity.name]
 		if lent then
 			if lent.fuel_categories then
 				fill4me.load_fuel(entity, lent, event.player_index)
@@ -110,17 +115,20 @@ end
 
 -- Scan through items, finding fuels & ammos
 function fill4me.evaluate_items()
-	global.fill4me.fuels = {}
-	global.fill4me.ammos = {}
+	local gs = global.fill4me
+	gs.fuels = {}
+	gs.ammos = {}
 	
 	-- evaluate fuel items
-	local fuels = global.fill4me.fuels
+	local fuels = gs.fuels
 	local fcategories = Fuel.categories()
 	for idx, name in pairs(fcategories) do
 		fuels[name] = {}
 	end
 	for idx, fuel in pairs(Fuel.list()) do
-		table.insert(fuels[fuel.category], fuel)
+		if not(gs.maximum_values.fuel > 0 and fuel.value > gs.maximum_values.fuel) then
+			table.insert(fuels[fuel.category], fuel)
+		end
 	end
 	for idx, fuellist in pairs(fuels) do
 		table.sort(fuellist, fill4me.fuel_sort_high)
@@ -132,7 +140,9 @@ function fill4me.evaluate_items()
 		ammos[name] = {}
 	end
 	for idx, ammo in pairs(Ammo.list()) do
-		table.insert(ammos[ammo.category], ammo)
+		if not(gs.maximum_values.ammo > 0 and ammo.damage and ammo.damage > gs.maximum_values.ammo) then
+			table.insert(ammos[ammo.category], ammo)
+		end
 	end
 	for name, itemlist in pairs(ammos) do
 		table.sort(itemlist, fill4me.item_dmg_sort_high)
@@ -164,10 +174,10 @@ function fill4me.item_dmg_sort_high(a, b)
 end
 
 function fill4me.load_ammo(entity, lent, plidx)
-	local player = game.players[plidx]
+	local player = game.get_player(plidx)
 	local proto = game.entity_prototypes[entity.name]
 	if lent.ammo_category then
-		for _, ammo in pairs(global.fill4me.ammos[lent.ammo_category]) do
+		for _, ammo in pairs(fill4me.for_player(plidx, "ammos")[lent.ammo_category]) do
 			if proto.attack_parameters and proto.attack_parameters.min_range < ammo.radius then
 				-- don't check this one.
 			else
@@ -187,7 +197,7 @@ function fill4me.load_ammo(entity, lent, plidx)
 	end
 	if lent.guns then
 		for _, gun in pairs(lent.guns) do
-			for _, ammo in pairs(global.fill4me.ammos[gun.ammo_category]) do
+			for _, ammo in pairs(fill4me.for_player(plidx, "ammos")[gun.ammo_category]) do
 				local count = fill4me.getFromInventory(player, ammo.name, ammo.max_size)
 				if count > 0 then
 					local loaded = fill4me.loadAmmoInto(entity, ammo.name, count)
@@ -206,10 +216,10 @@ end
 
 function fill4me.load_fuel(entity, lent, plidx)
 	-- Load fuel from player's inventory into the entity.
-	local player = game.players[plidx]
+	local player = game.get_player(plidx)
 	local found_fuel = false
 	for name, t in pairs(lent.fuel_categories) do
-		for _, fuel in pairs(global.fill4me.fuels[name]) do
+		for _, fuel in pairs(fill4me.for_player(plidx, "fuels")[name]) do
 			local count = fill4me.getFromInventory(player, fuel.name, fuel.max_size)
 			if count > 0 then
 				loaded = fill4me.loadFuelInto(entity, fuel.name, count)
@@ -256,15 +266,53 @@ function fill4me.loadInto(entity, item_name, quantity)
 	return entity.insert(itemstack)
 end
 
+function fill4me.loadModSettings(event)
+	local gms = settings.global
+	local gs = global.fill4me
+	if gms['fill4me-maximum-fuel-value'] then
+		gs['maximum_values'].fuel = gms['fill4me-maximum-fuel-value'].value
+	end
+	if gms['fill4me-maximum-ammo-value'] then
+		gs['maximum_values'].ammo = gms['fill4me-maximum-ammo-value'].value
+	end
+end
+
+function fill4me.loadModPlayerSettings(event)
+-- todo: make me do something?
+end
+
 function fill4me.player(plidx)
 	if not global.fill4me.players[plidx] then
 		global.fill4me.players[plidx] = {
 			enable = true,
 			max_load = 25,
 			max_load_percent = 0.12,
+			loadable_entities = nil,
+			fuels = nil,
+			ammos = nil,
 		}
 	end
 	return global.fill4me.players[plidx]
+end
+
+function fill4me.for_player(player, section)
+	-- get the relevent player data for ammo, fuel, etc, or global version.
+	local f4m_player = nil
+	if type(player) == "number" then
+		f4m_player = fill4me.player(player)
+	elseif type(player) == "table" then
+		if player.online_time then -- factorio player object.  get f4m player.
+			f4m_player = fill4me.player(player.index)
+		elseif player.max_load then -- f4m player.  check some field.
+			f4m_player = player
+		end
+	end
+	if f4m_player then
+		if f4m_player[section] and type(f4m_player[section]) == "table" then
+			return f4m_player[section]
+		end
+		return global.fill4me[section]
+	end
 end
 
 function fill4me.script_built_entity(event)
@@ -295,7 +343,7 @@ end
 
 function fill4me.toggle(plidx)
 	local pldata = fill4me.player(plidx)
-	local player = game.players[plidx]
+	local player = game.get_player(plidx)
 	pldata.enable = not pldata.enable
 	
 	if pldata.enable then
@@ -309,3 +357,4 @@ Event.register(Event.core_events.configuration_changed, fill4me.reInitMod)
 Event.register(Event.def("softmod_init"), fill4me.initMod)
 Event.register(defines.events.on_built_entity, fill4me.built_entity)
 Event.register(defines.events.script_raised_built, fill4me.script_built_entity)
+Event.register(defines.events.on_player_created, fill4me.loadModPlayerSettings)

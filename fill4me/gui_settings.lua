@@ -24,47 +24,36 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-	gui_button.lua
+	fill4me - gui-settings.lua
 
-Adds a gui button to enable/disable Fill4Me.
+	Build a UI for managing the settings used by Fill4Me.
+
+	Note: This UI is primarily for use with multiplayer, as single-player
+	users will likely desire to use the game's mod settings UI.
 
 --]]
 
--- Cannot require this twice, as it appears to break things.
---require '/lib/kwidgets'
+fill4me_gui = {}
 
-fill4me_guib = {}
-
-function fill4me_guib.addinCreateButton(event)
-	-- This is primarily here to create the button if this mod is added to an
-	-- existing game.
-	if game and game.players then
-		for idx, player in pairs(game.players) do
-			fill4me_guib.drawButton(player)
+function fill4me_gui.init()
+	kw_newTabDialog('fill4me.gui', 
+		{caption={'fill4me.gui.title'}},
+		{position='center', defaultTab='enable'}, 
+		function(dialog) -- instantiation.
+			-- must do button connections *outside* of any render functions.
+				dialog:addTab('enable',
+				{caption = {'fill4me.gui.enable.title'}, tooltip = {'fill4me.gui.enable.tooltip'}},
+				function(dialog, tab) -- tab instantiation
+					
+				end,
+				function(player, dialog, container) -- tab render
+				end
+			)
+		end,
+		function(player, dialog, container) -- dialog render
+			-- on display
 		end
-	end
+	)
 end
 
--- Button for disabling/enabling autofill
-function fill4me_guib.drawButton(player)
-	-- Check for the setting 'fill4me-gui-show-button' and if it's true.
-	local psettings = settings.get_player_settings(player)
-	local setting = psettings["fill4me-show-gui-button"]
-	if not setting or setting.value == true then
-		kw_newToolbarButton(player, "btn_toolbar_fill4me", {'fill4me.gui.enable_btn'}, {'fill4me.gui.enable_tooltip'}, 'item/uranium-rounds-magazine', fill4me_gui.toggle)
-	end
-end
-
-function fill4me_guib.toggle(event)
-	fill4me.toggle(event.player_index)
-end	
-
-function fill4me_guib.onJoinDoButton(event)
-	global.count = 0
-	local player = game.get_player(event.player_index)
-	fill4me_guib.drawButton(player)
-end
-
--- Event to create the button.
-Event.register(Event.def("softmod_init"), fill4me_guib.addinCreateButton)
-Event.register(defines.events.on_player_joined_game, fill4me_guib.onJoinDoButton)
+Event.register(Event.def("softmod_init"), fill4me_gui.init)
