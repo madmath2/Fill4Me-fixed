@@ -59,14 +59,17 @@ function fill4me.initMod(event)
 	if not global.fill4me then
 		global.fill4me = {
 			initialized = false,
-			maximum_values = {
-				fuel = 0,
-				ammo = 0,
-			},
 			fuels = {},
 			ammos = {},
 			loadable_entities = {},
 			players = {},
+		}
+	end
+	-- Need this to happen after, since it could be part of a mod upgrade.
+	if not global.fill4me.maximum_values then
+		global.fill4me.maximum_values = {
+			fuel = 0,
+			ammo = 0,
 		}
 	end
 	if not global.fill4me.initialized then

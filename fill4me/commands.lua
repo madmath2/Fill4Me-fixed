@@ -60,3 +60,67 @@ end
 
 commands.add_command('f4m.toggle', {'fill4me.gui.enable_tooltip'}, fill4me_cmd.toggle)
 commands.add_command('f4m.max_percent', {'fill4me.cmd.help_max_percent'}, fill4me_cmd.max_percent)
+
+
+if 0 then -- DEBUG functionality.
+	require 'lib/fb_util'
+	
+	function fill4me_cmd.debug(event)
+		local player = game.get_player(event.player_index)
+		local print = game.print
+		if player then print = player.print end
+		print(serpent.line(global.fill4me))
+	end
+
+	function fill4me_cmd.debug_fuel_type(event)
+		local player = game.get_player(event.player_index)
+		local print = game.print
+		if player then print = player.print end
+		if event.parameter then
+			local params = parseParams(event.parameter)
+			print(serpent.line(global.fill4me))
+		else
+			print(serpent.line(global.fill4me.fuels))
+		end
+	end
+
+	function fill4me_cmd.debug_ammo_type(event)
+		local player = game.get_player(event.player_index)
+		local print = game.print
+		if player then print = player.print end
+		if event.parameter then
+			local params = parseParams(event.parameter)
+			local ammos = global.fill4me.ammos[params[1]]
+			if ammos then
+				for _, data in ipairs(ammos) do
+					print(serpent.line(data))
+				end
+			else
+				print("Ammo type `"..params[1].."` not found.")
+			end
+		else
+			local categories = {}
+			for catname, data in pairs(global.fill4me.ammos) do
+				table.insert(categories, catname)
+			end
+			print(serpent.line(categories))
+		end
+	end
+	
+	function fill4me_cmd.debug_entity(event)
+		local player = game.get_player(event.player_index)
+		local print = game.print
+		if player then print = player.print end
+		if event.parameter then
+			local params = parseParams(event.parameter)
+			print(serpent.line(global.fill4me))
+		else
+			print(serpent.line(global.fill4me.loadable_entities))
+		end
+	end
+
+	commands.add_command('f4m.debug', '', fill4me_cmd.debug)
+	commands.add_command('f4m.debug.ammo', '', fill4me_cmd.debug_ammo_type)
+	commands.add_command('f4m.debug.fuel', '', fill4me_cmd.debug_fuel_type)
+	commands.add_command('f4m.debug.entity', '', fill4me_cmd.debug_entity)
+end
