@@ -85,6 +85,17 @@ function fill4me.reInitMod(event)
 	end
 	fill4me.initMod(event)
 end
+function fill4me.runtimeModSettingChanged(event)
+	if event.setting_type == "runtime-per-user" then
+	elseif event.setting_type == "runtime-global" then
+		local max_changed = string.match(event.setting, "fill4me%-maximum%-(%S+)%-value")
+		if max_changed then
+			fill4me.loadModSettings()
+			fill4me.evaluate_items()
+			fill4me.evaluate_entities()
+		end
+	end
+end
 
 -- Entity built by player.  Evaluate for inserting fuel & ammo.
 function fill4me.built_entity(event)
@@ -293,6 +304,7 @@ function fill4me.player(plidx)
 			loadable_entities = nil,
 			fuels = nil,
 			ammos = nil,
+			ammo_ignore_radius = false,
 		}
 	end
 	return global.fill4me.players[plidx]
@@ -358,6 +370,7 @@ end
 
 Event.register(Event.core_events.configuration_changed, fill4me.reInitMod)
 Event.register(Event.def("softmod_init"), fill4me.initMod)
+Event.register(defines.events.on_runtime_mod_setting_changed, fill4me.runtimeModSettingChanged)
 Event.register(defines.events.on_built_entity, fill4me.built_entity)
 Event.register(defines.events.script_raised_built, fill4me.script_built_entity)
 Event.register(defines.events.on_player_created, fill4me.loadModPlayerSettings)

@@ -62,7 +62,7 @@ commands.add_command('f4m.toggle', {'fill4me.gui.enable_tooltip'}, fill4me_cmd.t
 commands.add_command('f4m.max_percent', {'fill4me.cmd.help_max_percent'}, fill4me_cmd.max_percent)
 
 
-if 0 then -- DEBUG functionality.
+if true == false then -- DEBUG functionality.
 	require 'lib/fb_util'
 	
 	function fill4me_cmd.debug(event)

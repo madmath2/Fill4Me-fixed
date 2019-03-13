@@ -51,7 +51,9 @@ function fill4me_guib.drawButton(player)
 	local psettings = settings.get_player_settings(player)
 	local setting = psettings["fill4me-show-gui-button"]
 	if not setting or setting.value == true then
-		kw_newToolbarButton(player, "btn_toolbar_fill4me", {'fill4me.gui.enable_btn'}, {'fill4me.gui.enable_tooltip'}, 'item/uranium-rounds-magazine', fill4me_gui.toggle)
+		kw_newToolbarButton(player, "btn_toolbar_fill4me", {'fill4me.gui.enable_btn'}, {'fill4me.gui.enable_tooltip'}, 'item/uranium-rounds-magazine', fill4me_guib.toggle)
+	else
+		kw_delToolbarButton(player, "btn_toolbar_fill4me")
 	end
 end
 
@@ -65,6 +67,16 @@ function fill4me_guib.onJoinDoButton(event)
 	fill4me_guib.drawButton(player)
 end
 
+function fill4me_guib.runtimeModSettingChanged(event)
+	if event.setting_type == "runtime-per-user" then
+		if event.setting == "fill4me-show-gui-button" then
+			local player = game.get_player(event.player_index)
+			fill4me_guib.drawButton(player)
+		end
+	end
+end
+
 -- Event to create the button.
 Event.register(Event.def("softmod_init"), fill4me_guib.addinCreateButton)
 Event.register(defines.events.on_player_joined_game, fill4me_guib.onJoinDoButton)
+Event.register(defines.events.on_runtime_mod_setting_changed, fill4me_guib.runtimeModSettingChanged)
