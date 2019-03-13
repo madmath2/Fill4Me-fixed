@@ -28,4 +28,11 @@ data:extend({
 		setting_type = "runtime-per-user",
 		default_value = true
 	},
+	{
+		type = "bool-setting",
+		name = "fill4me-ignore-ammo-radius",
+		-- name is used to determine localization
+		setting_type = "runtime-per-user",
+		default_value = false
+	},
 })

@@ -87,6 +87,11 @@ function fill4me.reInitMod(event)
 end
 function fill4me.runtimeModSettingChanged(event)
 	if event.setting_type == "runtime-per-user" then
+		if event.setting == "fill4me-ignore-ammo-radius" then
+			local gmps = settings.get_player_settings(event.player_index)
+			local set_to = gmps["fill4me-ignore-ammo-radius"].value
+			fill4me.set_ignore_ammo_radius(event.player_index, set_to)
+		end
 	elseif event.setting_type == "runtime-global" then
 		local max_changed = string.match(event.setting, "fill4me%-maximum%-(%S+)%-value")
 		if max_changed then
@@ -187,14 +192,22 @@ function fill4me.item_dmg_sort_high(a, b)
 	return a.damage > b.damage
 end
 
+local function ammo_radius_is_ok(prototype, ammo, playerdata)
+	if playerdata.ignore_ammo_radius then
+		return true
+	elseif prototype.attack_parameters and prototype.attack_parameters.min_range < ammo.radius then
+		return false
+	end
+	return true
+end
+
 function fill4me.load_ammo(entity, lent, plidx)
 	local player = game.get_player(plidx)
+	local pldata = fill4me.player(plidx)
 	local proto = game.entity_prototypes[entity.name]
 	if lent.ammo_category then
 		for _, ammo in pairs(fill4me.for_player(plidx, "ammos")[lent.ammo_category]) do
-			if proto.attack_parameters and proto.attack_parameters.min_range < ammo.radius then
-				-- don't check this one.
-			else
+			if ammo_radius_is_ok(proto, ammo, pldata) then
 				local count = fill4me.getFromInventory(player, ammo.name, ammo.max_size)
 				if count > 0 then
 					local loaded = fill4me.loadAmmoInto(entity, ammo.name, count)
@@ -306,6 +319,14 @@ function fill4me.player(plidx)
 			ammos = nil,
 			ammo_ignore_radius = false,
 		}
+		-- overrides from player mod settings (if exists.)
+		local gms = settings.get_player_settings(plidx)
+		if gms then
+			local f4mplayer = global.fill4me.players[plidx]
+			if gms['fill4me-ignore-ammo-radius'] then
+				f4mplayer.ammo_ignore_radius = gms['fill4me-ignore-ammo-radius'].value
+			end
+		end
 	end
 	return global.fill4me.players[plidx]
 end
@@ -366,6 +387,21 @@ function fill4me.toggle(plidx)
 	else
 		player.print({'fill4me.prefix', {'fill4me.disabled'}})
 	end
+end
+
+function fill4me.set_ignore_ammo_radius(plidx, set_to)
+	local player = game.get_player(plidx)
+	local pldata = fill4me.player(plidx)
+	pldata.ignore_ammo_radius = set_to
+	if pldata.ignore_ammo_radius then
+		player.print({'fill4me.prefix', {'fill4me.ammo_radius_ignored'}})
+	else
+		player.print({'fill4me.prefix', {'fill4me.ammo_radius_checked'}})
+	end
+end
+function fill4me.toggle_ignore_ammo_radius(plidx)
+	local set_to = not fill4me.player(plidx).ignore_ammo_radius
+	fill4me.set_ignore_ammo_radius(plidx, set_to)
 end
 
 Event.register(Event.core_events.configuration_changed, fill4me.reInitMod)

@@ -58,8 +58,13 @@ function fill4me_cmd.toggle(event)
 	fill4me.toggle(event.player_index)
 end
 
+function fill4me_cmd.toggle_ignore_ammo_radius(event)
+	fill4me.toggle_ignore_ammo_radius(event.player_index)
+end
+
 commands.add_command('f4m.toggle', {'fill4me.gui.enable_tooltip'}, fill4me_cmd.toggle)
 commands.add_command('f4m.max_percent', {'fill4me.cmd.help_max_percent'}, fill4me_cmd.max_percent)
+commands.add_command('f4m.ignore_ammo_radius', {'fill4me.cmd.ignore_ammo_radius'}, fill4me_cmd.toggle_ignore_ammo_radius)
 
 
 if true == false then -- DEBUG functionality.
@@ -118,9 +123,32 @@ if true == false then -- DEBUG functionality.
 			print(serpent.line(global.fill4me.loadable_entities))
 		end
 	end
+	
+	function fill4me_cmd.debug_global(event)
+		local player = game.get_player(event.player_index)
+		local print = game.print
+		if player then print = player.print end
+		print(serpent.line(global.fill4me))
+	end
+	
+	function fill4me_cmd.debug_player(event)
+		local player = game.get_player(event.player_index)
+		local print = game.print
+		if player then print = player.print end
+		local pldata = nil
+		if event.parameter then
+			local params = parseParams(event.parameter)
+			pldata = fill4me.player(game.get_player(params[1]))
+		else
+			pldata = fill4me.player(event.player_index)
+		end
+		print(serpent.line(pldata))
+	end
 
 	commands.add_command('f4m.debug', '', fill4me_cmd.debug)
 	commands.add_command('f4m.debug.ammo', '', fill4me_cmd.debug_ammo_type)
 	commands.add_command('f4m.debug.fuel', '', fill4me_cmd.debug_fuel_type)
 	commands.add_command('f4m.debug.entity', '', fill4me_cmd.debug_entity)
+	commands.add_command('f4m.debug.global', '', fill4me_cmd.debug_global)
+	commands.add_command('f4m.debug.player', '', fill4me_cmd.debug_player)
 end

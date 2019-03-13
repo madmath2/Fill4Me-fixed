@@ -1,4 +1,16 @@
 --------------------------------------------------------------------------------
+Version: 0.5.3
+Date: Mar 13, 2019
+Changes:
+  - Add player option to ignore an ammo radius when autofilling turrets.
+
+--------------------------------------------------------------------------------
+Version: 0.5.2
+Date: Mar 13, 2019
+Changes:
+  - Fix usage of runtime values (maximum-*-value & show-gui-button)
+
+--------------------------------------------------------------------------------
 Version: 0.5.1
 Date: Mar 5, 2019
 Changes:
