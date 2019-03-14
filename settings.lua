@@ -35,4 +35,30 @@ data:extend({
 		setting_type = "runtime-per-user",
 		default_value = false
 	},
+	{
+		type = "string-setting",
+		name = "fill4me-ammo-load-limit",
+		setting_type = "runtime-per-user",
+		default_value = "both",
+		allowed_values = {"percent", "count", "both"},
+		order = "ammo-load-1",
+	},
+	{
+		type = "double-setting",
+		name = "fill4me-ammo-load-percent",
+		setting_type = "runtime-per-user",
+		default_value = 25.0,
+		minimum_value = 0.1,
+		maximum_value = 100.0,
+		order = "ammo-load-2",
+	},
+	{
+		type = "int-setting",
+		name = "fill4me-ammo-load-count",
+		setting_type = "runtime-per-user",
+		default_value = 10,
+		minimum_value = 1,
+		maximum_value = 200,
+		order = "ammo-load-3",
+	},
 })

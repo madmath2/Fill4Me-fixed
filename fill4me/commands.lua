@@ -38,7 +38,8 @@ function fill4me_cmd.max_percent(event)
 		local percent = tonumber(event.parameter)
 		if percent and percent > 0 and percent <= 100 then
 			local pldata = fill4me.player(event.player_index)
-			pldata.max_load_percent = percent / 100
+			pldata.max_ammo_load_percent = percent / 100
+			pldata.max_fuel_load_percent = percent / 100
 			player.print({'fill4me.prefix', {'fill4me.cmd.set_max_percent', percent}})
 		else
 			-- display error

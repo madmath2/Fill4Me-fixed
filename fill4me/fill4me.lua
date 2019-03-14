@@ -79,6 +79,9 @@ function fill4me.initMod(event)
 		global.fill4me.initialized = true
 	end
 end
+function fill4me.initPlayer(event)
+	fill4me.player(event.player_index)
+end
 function fill4me.reInitMod(event)
 	if global.fill4me then
 		global.fill4me.initialized = false
@@ -87,11 +90,7 @@ function fill4me.reInitMod(event)
 end
 function fill4me.runtimeModSettingChanged(event)
 	if event.setting_type == "runtime-per-user" then
-		if event.setting == "fill4me-ignore-ammo-radius" then
-			local gmps = settings.get_player_settings(event.player_index)
-			local set_to = gmps["fill4me-ignore-ammo-radius"].value
-			fill4me.set_ignore_ammo_radius(event.player_index, set_to)
-		end
+		fill4me.loadModPlayerSettings(event.player_index)
 	elseif event.setting_type == "runtime-global" then
 		local max_changed = string.match(event.setting, "fill4me%-maximum%-(%S+)%-value")
 		if max_changed then
@@ -172,14 +171,26 @@ function fill4me.fuel_sort_high(a, b)
 	return a.value > b.value
 end
 
-function fill4me.getFromInventory(player, item_name, max_size)
+function fill4me.getFromInventory(player, item_name, max_size, ammo_or_fuel)
+	local function max_load(pldata, ammo_or_fuel)
+		if ammo_or_fuel == "ammo" then
+			return pldata.max_ammo_load
+		end
+		return pldata.max_fuel_load
+	end
+	local function max_load_percent(pldata, ammo_or_fuel)
+		if ammo_or_fuel == "ammo" then
+			return pldata.max_ammo_load_percent
+		end
+		return pldata.max_fuel_load_percent
+	end
 	local pldata = fill4me.player(player.index)
-	local amount_to_get = math.min(max_size, pldata.max_load)
 	local inventory = player.get_inventory(defines.inventory.player_main)
 	local available = inventory.get_item_count(item_name)
-	removed = 0
+	local removed = 0
 	if available > 0 then
-		removed = math.min(amount_to_get, math.ceil(available*pldata.max_load_percent))
+		removed = math.min(max_load(pldata, ammo_or_fuel), math.ceil(available*max_load_percent(pldata, ammo_or_fuel)))
+		removed = math.min(removed, available)
 		inventory.remove({name=item_name, count=removed})
 	end
 	return removed
@@ -208,7 +219,7 @@ function fill4me.load_ammo(entity, lent, plidx)
 	if lent.ammo_category then
 		for _, ammo in pairs(fill4me.for_player(plidx, "ammos")[lent.ammo_category]) do
 			if ammo_radius_is_ok(proto, ammo, pldata) then
-				local count = fill4me.getFromInventory(player, ammo.name, ammo.max_size)
+				local count = fill4me.getFromInventory(player, ammo.name, ammo.max_size, "ammo")
 				if count > 0 then
 					local loaded = fill4me.loadAmmoInto(entity, ammo.name, count)
 					if loaded > 0 then
@@ -225,7 +236,7 @@ function fill4me.load_ammo(entity, lent, plidx)
 	if lent.guns then
 		for _, gun in pairs(lent.guns) do
 			for _, ammo in pairs(fill4me.for_player(plidx, "ammos")[gun.ammo_category]) do
-				local count = fill4me.getFromInventory(player, ammo.name, ammo.max_size)
+				local count = fill4me.getFromInventory(player, ammo.name, ammo.max_size, "ammo")
 				if count > 0 then
 					local loaded = fill4me.loadAmmoInto(entity, ammo.name, count)
 					if loaded > 0 then
@@ -247,7 +258,7 @@ function fill4me.load_fuel(entity, lent, plidx)
 	local found_fuel = false
 	for name, t in pairs(lent.fuel_categories) do
 		for _, fuel in pairs(fill4me.for_player(plidx, "fuels")[name]) do
-			local count = fill4me.getFromInventory(player, fuel.name, fuel.max_size)
+			local count = fill4me.getFromInventory(player, fuel.name, fuel.max_size, "fuel")
 			if count > 0 then
 				loaded = fill4me.loadFuelInto(entity, fuel.name, count)
 				if loaded > 0 then
@@ -304,16 +315,32 @@ function fill4me.loadModSettings(event)
 	end
 end
 
-function fill4me.loadModPlayerSettings(event)
--- todo: make me do something?
+function fill4me.loadModPlayerSettings(plidx, pldata)
+	local gmps = settings.get_player_settings(plidx)
+	if gmps then
+		if not pldata then
+			pldata = fill4me.player(plidx)
+		end
+		pldata.ignore_ammo_radius = gmps["fill4me-ignore-ammo-radius"].value
+		pldata.max_ammo_load = gmps["fill4me-ammo-load-count"].value
+		pldata.max_ammo_load_percent = gmps["fill4me-ammo-load-percent"].value / 100.0
+		if gmps["fill4me-ammo-load-limit"].value == "percent" then
+			pldata.max_ammo_load = 1000
+		end
+		if gmps["fill4me-ammo-load-limit"].value == "count" then
+			pldata.max_ammo_load_percent = 100
+		end
+	end
 end
 
 function fill4me.player(plidx)
 	if not global.fill4me.players[plidx] then
 		global.fill4me.players[plidx] = {
 			enable = true,
-			max_load = 25,
-			max_load_percent = 0.12,
+			max_fuel_load = 25,
+			max_fuel_load_percent = 0.12,
+			max_ammo_load = 25,
+			max_ammo_load_percent = 0.12,
 			loadable_entities = nil,
 			fuels = nil,
 			ammos = nil,
@@ -323,12 +350,24 @@ function fill4me.player(plidx)
 		local gms = settings.get_player_settings(plidx)
 		if gms then
 			local f4mplayer = global.fill4me.players[plidx]
-			if gms['fill4me-ignore-ammo-radius'] then
-				f4mplayer.ammo_ignore_radius = gms['fill4me-ignore-ammo-radius'].value
-			end
+			-- always need to pass the f4m player here, otherwise this code
+			-- will do an infinite loop, back & forth.
+			fill4me.loadModPlayerSettings(plidx, f4mplayer)
 		end
 	end
-	return global.fill4me.players[plidx]
+	local f4mplayer = global.fill4me.players[plidx]
+	fill4me.try_migrate_player(f4mplayer)
+	return f4mplayer
+end
+function fill4me.try_migrate_player(f4mplayer)
+	if f4mplayer.max_load then
+		f4mplayer.max_fuel_load = f4mplayer.max_load
+		f4mplayer.max_ammo_load = f4mplayer.max_load
+		f4mplayer.max_fuel_load_percent = f4mplayer.max_load_percent
+		f4mplayer.max_ammo_load_percent = f4mplayer.max_load_percent
+		f4mplayer.max_load = nil
+		f4mplayer.max_load_percent = nil
+	end
 end
 
 function fill4me.for_player(player, section)
@@ -339,7 +378,7 @@ function fill4me.for_player(player, section)
 	elseif type(player) == "table" then
 		if player.online_time then -- factorio player object.  get f4m player.
 			f4m_player = fill4me.player(player.index)
-		elseif player.max_load then -- f4m player.  check some field.
+		elseif player.max_ammo_load then -- f4m player.  check some field.
 			f4m_player = player
 		end
 	end
@@ -409,4 +448,4 @@ Event.register(Event.def("softmod_init"), fill4me.initMod)
 Event.register(defines.events.on_runtime_mod_setting_changed, fill4me.runtimeModSettingChanged)
 Event.register(defines.events.on_built_entity, fill4me.built_entity)
 Event.register(defines.events.script_raised_built, fill4me.script_built_entity)
-Event.register(defines.events.on_player_created, fill4me.loadModPlayerSettings)
+Event.register(defines.events.on_player_created, fill4me.initPlayer)
