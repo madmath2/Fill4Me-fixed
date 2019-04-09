@@ -1,4 +1,16 @@
 --------------------------------------------------------------------------------
+Version: 0.5.5
+Date: Apr 9, 2019
+Changes:
+  - Add Russian locale.
+
+--------------------------------------------------------------------------------
+Version: 0.5.4
+Date: Mar 13, 2019
+Changes:
+  - Revise ammo loading to use player settings to determine how to load.
+
+--------------------------------------------------------------------------------
 Version: 0.5.3
 Date: Mar 13, 2019
 Changes:
