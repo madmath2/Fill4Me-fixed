@@ -1,88 +1,93 @@
---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+Version: 0.5.6
+Date: Apr 19, 2019
+  Changes:
+    - Add TR locale.
+
+---------------------------------------------------------------------------------------------------
 Version: 0.5.5
 Date: Apr 9, 2019
-Changes:
-  - Add Russian locale.
+  Changes:
+    - Add Russian locale.
 
---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 Version: 0.5.4
 Date: Mar 13, 2019
-Changes:
-  - Revise ammo loading to use player settings to determine how to load.
+  Changes:
+    - Revise ammo loading to use player settings to determine how to load.
 
---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 Version: 0.5.3
 Date: Mar 13, 2019
-Changes:
-  - Add player option to ignore an ammo radius when autofilling turrets.
+  Changes:
+    - Add player option to ignore an ammo radius when autofilling turrets.
 
---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 Version: 0.5.2
 Date: Mar 13, 2019
-Changes:
-  - Fix usage of runtime values (maximum-*-value & show-gui-button)
+  Changes:
+    - Fix usage of runtime values (maximum-*-value & show-gui-button)
 
---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 Version: 0.5.1
 Date: Mar 5, 2019
-Changes:
-  - Attempt to fix usage of "maximum values" for saved games.
+  Changes:
+    - Attempt to fix usage of "maximum values" for saved games.
 
---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 Version: 0.5.0
 Date: Mar 5, 2019
-Changes:
-  - Added mod global settings to tell Fill4Me to only use ammos or fuels up to a certain value.
-  - - This is particular useful for fuels, as it allows you to specify 100000000 (100 million) for fuels, and the highest level fuel that it will auto-insert will be Rocket Fuel (which has a value of 100million)
+  Changes:
+    - Added mod global settings to tell Fill4Me to only use ammos or fuels up to a certain value.
+      This is particular useful for fuels, as it allows you to specify 100000000 (100 million) for fuels, and the highest level fuel that it will auto-insert will be Rocket Fuel (which has a value of 100million)
 
---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 Version: 0.4.4
 Date: Mar 5, 2019
-Changes:
-  - Added mod player setting to hide the Fill4Me enable/disable button.
-  
---------------------------------------------------------------------------------
+  Changes:
+    - Added mod player setting to hide the Fill4Me enable/disable button.
+
+---------------------------------------------------------------------------------------------------
 Version: 0.4.3
 Date: Feb 27, 2019
-Changes:
-  - Grabbed Martin's small change to make this work on 0.17.
-  
---------------------------------------------------------------------------------
+  Changes:
+    - Grabbed Martin's small change to make this work on 0.17.
+
+---------------------------------------------------------------------------------------------------
 Version: 0.4.2
 Date: Oct 15, 2018
-Changes:
-  - Attempt to work around issue found when using bobsmods where a created_entity may be invalid.
-  
---------------------------------------------------------------------------------
+  Changes:
+    - Attempt to work around issue found when using bobsmods where a created_entity may be invalid.
+
+---------------------------------------------------------------------------------------------------
 Version: 0.4.1
 Date: Aug 13, 2018
-Changes:
-  - Fix Fill4Me's event changes to work when configuration changes (eg, load from save with updated version of mod).
+  Changes:
+    - Fix Fill4Me's event changes to work when configuration changes (eg, load from save with updated version of mod).
 
---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 Version: 0.4.0
 Date: Aug 8, 2018
-Changes:
-  - Prevent Fill4Me from accidentally causing an insert into a vehicle to overflow into the vehicle's trunk.
-  - Make Fill4Me's interaction with script_raised_built events from other mods happen on a tick later, to let the other mod do it's potential work on that entity.
-  - Fixes & works around an issue with the Vehicle Wagon mod.
-  
---------------------------------------------------------------------------------
+  Changes:
+    - Prevent Fill4Me from accidentally causing an insert into a vehicle to overflow into the vehicle's trunk.
+    - Make Fill4Me's interaction with script_raised_built events from other mods happen on a tick later, to let the other mod do it's potential work on that entity.
+    - Fixes & works around an issue with the Vehicle Wagon mod.
+
+---------------------------------------------------------------------------------------------------
 Version: 0.3.0
 Date: Aug 8, 2018
-Changes:
-  - Fix issue when handling prototypes that define an ammotype, but no action.
-  
---------------------------------------------------------------------------------
+  Changes:
+    - Fix issue when handling prototypes that define an ammotype, but no action.
+
+---------------------------------------------------------------------------------------------------
 Version: 0.2.0
 Date: Jul 25, 2018
-Changes:
-  - Adds support for script_raised_built events where created_entity & player_index are defined (just like regular on_built_entity events). This can resolve issues where other mods are replacing the entity being built at the time of construction (provided they raise the appropriate event).
+  Changes:
+    - Adds support for script_raised_built events where created_entity & player_index are defined (just like regular on_built_entity events). This can resolve issues where other mods are replacing the entity being built at the time of construction (provided they raise the appropriate event).
 
---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 Version: 0.1.0
 Date: Jul 19, 2018
-Changes:
-  - Initial release.
+  Changes:
+    - Initial release.
 
---------------------------------------------------------------------------------
