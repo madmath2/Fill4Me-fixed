@@ -10,7 +10,7 @@ Just in case you missed that:  __Fill4Me will work with any ammunition or fuel t
 
 Fill4Me does not have much of a GUI at current, as there's not much of a need for one.  There is a tool button (top-left) which enable/disables Fill4Me at current.
 
-* `/f4m.toggle` - Enable/Disabled Fill4Me.
+* `/f4m.toggle` - Enable/Disable Fill4Me.
 * `/f4m.max_percent` - Sets the maximum percent of an on-hand resource to place into an entity.  (Default 12%)
 
 #### Why
