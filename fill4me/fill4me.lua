@@ -185,7 +185,10 @@ function fill4me.getFromInventory(player, item_name, max_size, ammo_or_fuel)
 		return pldata.max_fuel_load_percent
 	end
 	local pldata = fill4me.player(player.index)
-	local inventory = player.get_inventory(defines.inventory.player_main)
+	local inventory = player.get_main_inventory()
+	if not inventory then
+		return 0
+	end
 	local available = inventory.get_item_count(item_name)
 	local removed = 0
 	if available > 0 then
