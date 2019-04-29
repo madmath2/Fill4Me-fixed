@@ -403,10 +403,7 @@ function fill4me.textRemove(player, entity, item_name, quantity, color)
 	local pldata = fill4me.player(player.index)
 	pos.x = pos.x + 1
 	pos.y = pos.y + pldata.ft_offset
-	textcolor = {r=1, g=1, b=1, a=1}
-	if color then
-		textcolor = color
-	end
+	local textcolor = color or {r=1, g=1, b=1, a=1}
 	player.surface.create_entity({ 
 		name = "flying-text",
 		color = textcolor,
