@@ -30,6 +30,8 @@ Commands for Fill4Me.  (Precursor to a UI)
 
 --]]
 
+require 'lib/fb_util'
+
 fill4me_cmd = {}
 
 function fill4me_cmd.exclude(event)
@@ -161,84 +163,86 @@ commands.add_command('f4m.list_all_fuel',  {'fill4me.cmd.list_all_fuel'}, fill4m
 commands.add_command('f4m.exclude', {'fill4me.cmd.exclude'}, fill4me_cmd.exclude)
 commands.add_command('f4m.include', {'fill4me.cmd.include'}, fill4me_cmd.include)
 
+--
+-- Debug commands
+-- 
+
+function fill4me_cmd.debug(event)
+	local player = game.get_player(event.player_index)
+	local print = game.print
+	if player then print = player.print end
+	print(serpent.line(global.fill4me))
+end
+
+function fill4me_cmd.debug_fuel_type(event)
+	local player = game.get_player(event.player_index)
+	local print = game.print
+	if player then print = player.print end
+	if event.parameter then
+		local params = parseParams(event.parameter)
+		print(serpent.line(global.fill4me))
+	else
+		print(serpent.line(global.fill4me.fuels))
+	end
+end
+
+function fill4me_cmd.debug_ammo_type(event)
+	local player = game.get_player(event.player_index)
+	local print = game.print
+	if player then print = player.print end
+	if event.parameter then
+		local params = parseParams(event.parameter)
+		local ammos = global.fill4me.ammos[params[1]]
+		if ammos then
+			for _, data in ipairs(ammos) do
+				print(serpent.line(data))
+			end
+		else
+			print("Ammo type `"..params[1].."` not found.")
+		end
+	else
+		local categories = {}
+		for catname, data in pairs(global.fill4me.ammos) do
+			table.insert(categories, catname)
+		end
+		print(serpent.line(categories))
+	end
+end
+
+function fill4me_cmd.debug_entity(event)
+	local player = game.get_player(event.player_index)
+	local print = game.print
+	if player then print = player.print end
+	if event.parameter then
+		local params = parseParams(event.parameter)
+		print(serpent.line(global.fill4me))
+	else
+		print(serpent.line(global.fill4me.loadable_entities))
+	end
+end
+
+function fill4me_cmd.debug_global(event)
+	local player = game.get_player(event.player_index)
+	local print = game.print
+	if player then print = player.print end
+	print(serpent.line(global.fill4me))
+end
+
+function fill4me_cmd.debug_player(event)
+	local player = game.get_player(event.player_index)
+	local print = game.print
+	if player then print = player.print end
+	local pldata = nil
+	if event.parameter then
+		local params = parseParams(event.parameter)
+		pldata = fill4me.player(game.get_player(params[1]))
+	else
+		pldata = fill4me.player(event.player_index)
+	end
+	print(serpent.line(pldata))
+end
+
 if true == false then -- DEBUG functionality.
-	require 'lib/fb_util'
-	
-	function fill4me_cmd.debug(event)
-		local player = game.get_player(event.player_index)
-		local print = game.print
-		if player then print = player.print end
-		print(serpent.line(global.fill4me))
-	end
-
-	function fill4me_cmd.debug_fuel_type(event)
-		local player = game.get_player(event.player_index)
-		local print = game.print
-		if player then print = player.print end
-		if event.parameter then
-			local params = parseParams(event.parameter)
-			print(serpent.line(global.fill4me))
-		else
-			print(serpent.line(global.fill4me.fuels))
-		end
-	end
-
-	function fill4me_cmd.debug_ammo_type(event)
-		local player = game.get_player(event.player_index)
-		local print = game.print
-		if player then print = player.print end
-		if event.parameter then
-			local params = parseParams(event.parameter)
-			local ammos = global.fill4me.ammos[params[1]]
-			if ammos then
-				for _, data in ipairs(ammos) do
-					print(serpent.line(data))
-				end
-			else
-				print("Ammo type `"..params[1].."` not found.")
-			end
-		else
-			local categories = {}
-			for catname, data in pairs(global.fill4me.ammos) do
-				table.insert(categories, catname)
-			end
-			print(serpent.line(categories))
-		end
-	end
-	
-	function fill4me_cmd.debug_entity(event)
-		local player = game.get_player(event.player_index)
-		local print = game.print
-		if player then print = player.print end
-		if event.parameter then
-			local params = parseParams(event.parameter)
-			print(serpent.line(global.fill4me))
-		else
-			print(serpent.line(global.fill4me.loadable_entities))
-		end
-	end
-	
-	function fill4me_cmd.debug_global(event)
-		local player = game.get_player(event.player_index)
-		local print = game.print
-		if player then print = player.print end
-		print(serpent.line(global.fill4me))
-	end
-	
-	function fill4me_cmd.debug_player(event)
-		local player = game.get_player(event.player_index)
-		local print = game.print
-		if player then print = player.print end
-		local pldata = nil
-		if event.parameter then
-			local params = parseParams(event.parameter)
-			pldata = fill4me.player(game.get_player(params[1]))
-		else
-			pldata = fill4me.player(event.player_index)
-		end
-		print(serpent.line(pldata))
-	end
-
 	commands.add_command('f4m.debug', '', fill4me_cmd.debug)
 	commands.add_command('f4m.debug.ammo', '', fill4me_cmd.debug_ammo_type)
 	commands.add_command('f4m.debug.fuel', '', fill4me_cmd.debug_fuel_type)
