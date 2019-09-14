@@ -348,6 +348,7 @@ function fill4me.player(plidx)
 			fuels = nil,
 			ammos = nil,
 			ammo_ignore_radius = false,
+			exclusions = {},
 		}
 		-- overrides from player mod settings (if exists.)
 		local gms = settings.get_player_settings(plidx)
@@ -371,6 +372,9 @@ function fill4me.try_migrate_player(f4mplayer)
 		f4mplayer.max_load = nil
 		f4mplayer.max_load_percent = nil
 	end
+	if not f4mplayer.exclusions then
+		f4mplayer.exclusions = {}
+	end
 end
 
 function fill4me.for_player(player, section)
@@ -386,10 +390,13 @@ function fill4me.for_player(player, section)
 		end
 	end
 	if f4m_player then
-		if f4m_player[section] and type(f4m_player[section]) == "table" then
-			return f4m_player[section]
+		if not global.fill4me[section] then
+			return
 		end
-		return global.fill4me[section]
+		if not (f4m_player[section] and type(f4m_player[section]) == "table") then
+			f4m_player[section] = table.deepcopy(global.fill4me[section])
+		end
+		return f4m_player[section]
 	end
 end
 

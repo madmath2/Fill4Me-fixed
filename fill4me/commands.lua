@@ -32,6 +32,72 @@ Commands for Fill4Me.  (Precursor to a UI)
 
 fill4me_cmd = {}
 
+function fill4me_cmd.exclude(event)
+	local player = game.players[event.player_index]
+	local f4mplayer = fill4me.player(player.index)
+	if event.parameter then
+		local fuel_list = fill4me.for_player(player.index, "fuels")
+		local removed = false
+		for name, data in pairs(fuel_list) do
+			for index, fuel in pairs(fuel_list[name]) do
+				if fuel.name == event.parameter then
+					table.remove(data, index)
+					player.print({'fill4me.cmd.exclude.excluding', fuel.i18n})
+					table.insert(f4mplayer.exclusions, fuel.name)
+					removed = true
+				end
+			end
+		end
+		if not removed then
+			player.print({'fill4me.cmd.error_exclude', event.parameter})
+		end
+	else
+		-- display error
+		player.print({'fill4me.prefix', {'fill4me.cmd.error_in_command'}})
+		player.print({'fill4me.cmd.usage_exclude'})
+		player.print({'fill4me.cmd.example', {'fill4me.cmd.example_exclude'}})
+	end
+end
+
+function fill4me_cmd.include(event)
+	local player = game.players[event.player_index]
+	local f4mplayer = fill4me.player(player.index)
+	if event.parameter then
+		local fuel_list = global.fill4me.fuels
+		local cat = nil
+		local fuel_to_add = nil
+		for catname, data in pairs(fuel_list) do
+			for index, fuel in pairs(data) do
+				if fuel.name == event.parameter then
+					cat = catname
+					fuel_to_add = fuel
+				end
+			end
+		end	
+		if fuel_to_add == nil then
+			player.print({'fill4me.cmd.error_include_not_found', event.parameter})
+			return
+		end
+		local player_fuel_list = fill4me.for_player(player.index, "fuels")[cat]
+		local already_included = false
+		for index, fuel in pairs(player_fuel_list) do
+			if fuel.name == fuel_to_add.name then
+				already_included = true
+			end
+		end
+		if not already_included then
+			table.insert(player_fuel_list, table.deepcopy(fuel_to_add))
+			table.sort(player_fuel_list, fill4me.fuel_sort_high)
+		end
+		player.print({'fill4me.cmd.include.including', fuel_to_add.i18n})
+	else
+		-- display error
+		player.print({'fill4me.prefix', {'fill4me.cmd.error_in_command'}})
+		player.print({'fill4me.cmd.usage_include'})
+		player.print({'fill4me.cmd.example', {'fill4me.cmd.example_include'}})
+	end
+end
+
 function fill4me_cmd.max_percent(event)
 	local player = game.players[event.player_index]
 	if event.parameter then
@@ -55,6 +121,30 @@ function fill4me_cmd.max_percent(event)
 	end
 end
 
+function fill4me_cmd.list_fuel(event)
+	local player = game.get_player(event.player_index)
+	local fuel_list = fill4me.for_player(player.index, "fuels")
+	for index, name in pairs(Fuel.categories()) do
+		local fuels = {}
+		for _, fuel in pairs(fuel_list[name]) do
+			table.insert(fuels, fuel.name)
+		end
+		player.print({'', name, ': ', serpent.line(fuels) })
+	end
+end
+
+function fill4me_cmd.list_all_fuel(event)
+	local player = game.get_player(event.player_index)
+	local fuel_list = global.fill4me.fuels
+	for index, name in pairs(Fuel.categories()) do
+		local fuels = {}
+		for _, fuel in pairs(fuel_list[name]) do
+			table.insert(fuels, fuel.name)
+		end
+		player.print({'', name, ': ', serpent.line(fuels) })
+	end
+end
+
 function fill4me_cmd.toggle(event)
 	fill4me.toggle(event.player_index)
 end
@@ -66,7 +156,10 @@ end
 commands.add_command('f4m.toggle', {'fill4me.gui.enable_tooltip'}, fill4me_cmd.toggle)
 commands.add_command('f4m.max_percent', {'fill4me.cmd.help_max_percent'}, fill4me_cmd.max_percent)
 commands.add_command('f4m.ignore_ammo_radius', {'fill4me.cmd.ignore_ammo_radius'}, fill4me_cmd.toggle_ignore_ammo_radius)
-
+commands.add_command('f4m.list_fuel',  {'fill4me.cmd.list_fuel'}, fill4me_cmd.list_fuel)
+commands.add_command('f4m.list_all_fuel',  {'fill4me.cmd.list_all_fuel'}, fill4me_cmd.list_all_fuel)
+commands.add_command('f4m.exclude', {'fill4me.cmd.exclude'}, fill4me_cmd.exclude)
+commands.add_command('f4m.include', {'fill4me.cmd.include'}, fill4me_cmd.include)
 
 if true == false then -- DEBUG functionality.
 	require 'lib/fb_util'
