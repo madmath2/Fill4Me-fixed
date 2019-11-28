@@ -51,15 +51,33 @@ function fill4me_guib.drawButton(player)
 	local psettings = settings.get_player_settings(player)
 	local setting = psettings["fill4me-show-gui-button"]
 	if not setting or setting.value == true then
-		kw_newToolbarButton(player, "btn_toolbar_fill4me", {'fill4me.gui.enable_btn'}, {'fill4me.gui.enable_tooltip'}, 'item/uranium-rounds-magazine', fill4me_guib.toggle)
+		local sprite_name = fill4me_guib.sprite_when(true)
+		kw_newToolbarButton(player, "btn_toolbar_fill4me", {'fill4me.gui.enable_btn'}, {'fill4me.gui.enable_tooltip'}, sprite_name, fill4me_guib.toggle)
+		fill4me_guib.reset_button_sprite_for(player.index)
 	else
 		kw_delToolbarButton(player, "btn_toolbar_fill4me")
 	end
 end
 
+function fill4me_guib.reset_button_sprite_for(plidx)
+	local pldata = fill4me.player(plidx)
+	local player = game.get_player(plidx)
+	local button = kw_getToolbarButton(player, "btn_toolbar_fill4me")
+	if button then
+		button.sprite = fill4me_guib.sprite_when(pldata.enable)
+	end
+end
+
+function fill4me_guib.sprite_when(enabled)
+	if enabled then
+		return "item/uranium-rounds-magazine"
+	end
+	return "item/piercing-rounds-magazine"
+end
+
 function fill4me_guib.toggle(event)
 	fill4me.toggle(event.player_index)
-end	
+end
 
 function fill4me_guib.onJoinDoButton(event)
 	global.count = 0

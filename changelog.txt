@@ -1,11 +1,12 @@
 ---------------------------------------------------------------------------------------------------
-Version: 0.8.0
+Version: 0.8.1
 Date: Nov 28, 2019
   Changes:
     - Add hotkey functionality to "reload" ammo or fuel into an entity.  Defaults to control+R.
     - Add hotkey for enabling/disabling Fill4Me.  Defaults to control+shift+R.
     - Add /f4m.reset_me command to reset your auto-fill list to the current game default.
     - Resets all players auto-fill entries list upon mod change (prevents problems when ammo or fuel items are removed from the game).
+    - Change Toolbar button icon from green uranium ammo to red piercing ammo when disabled (and back when enabled)
 
 ---------------------------------------------------------------------------------------------------
 Version: 0.7.1
