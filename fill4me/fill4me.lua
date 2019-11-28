@@ -77,7 +77,7 @@ function fill4me.initMod(event)
 		fill4me.loadModSettings()
 		fill4me.evaluate_items()
 		fill4me.evaluate_entities()
-		--fill4me.cleanup_player_data()
+		fill4me.reset_players_loadables()
 		global.fill4me.initialized = true
 	end
 end
@@ -101,6 +101,13 @@ function fill4me.runtimeModSettingChanged(event)
 			fill4me.evaluate_entities()
 		end
 	end
+end
+function fill4me.reset_players_loadables()
+	local f4mdata = global.fill4me
+	for idx, pldata in pairs(f4mdata.players) do
+		fill4me.reset_player_lists(idx)
+	end
+	game.print({'fill4me.prefix', {'fill4me.players_reset'}})
 end
 
 -- Entity built by player.  Evaluate for inserting fuel & ammo.
@@ -396,6 +403,15 @@ function fill4me.try_migrate_player(f4mplayer)
 	end
 	if not f4mplayer.exclusions then
 		f4mplayer.exclusions = {}
+	end
+end
+
+function fill4me.reset_player_lists(player_index)
+	local player = global.fill4me.players[player_index]
+	if player then
+		player.loadable_entities = nil
+		player.ammos = nil
+		player.fuels = nil
 	end
 end
 
