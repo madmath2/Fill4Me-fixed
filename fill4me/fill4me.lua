@@ -51,6 +51,7 @@ require 'fill4me/loadable_entities'
 -- smoke-based entities/items.  There is a failing in the code exposed to lua
 -- which prevents being able to identify the base damage of things like 
 -- poison-capsule (item) / poison-cloud (entity)
+require 'util' -- needed by 'production-score' (below)
 require 'production-score' -- for production_score.generate_price_list()
 
 fill4me = {}
@@ -76,6 +77,7 @@ function fill4me.initMod(event)
 		fill4me.loadModSettings()
 		fill4me.evaluate_items()
 		fill4me.evaluate_entities()
+		--fill4me.cleanup_player_data()
 		global.fill4me.initialized = true
 	end
 end
@@ -199,6 +201,16 @@ function fill4me.getFromInventory(player, item_name, max_size, ammo_or_fuel)
 	return removed
 end
 
+function fill4me.returnToInventory(player, item_name, amount, ammo_or_fuel)
+	local pldata = fill4me.player(player.index)
+	local inventory = player.get_main_inventory()
+	if not inventory then
+		return 0
+	end
+	inventory.insert({name=item_name, count=amount})
+	return amount
+end
+
 function fill4me.item_dmg_sort_high(a, b)
 	if a.damage == b.damage then
 		return a.craft_value > b.craft_value
@@ -215,6 +227,23 @@ local function ammo_radius_is_ok(prototype, ammo, playerdata)
 	return true
 end
 
+local function try_ammo_load(entity, player, ammo)
+	local count = fill4me.getFromInventory(player, ammo.name, ammo.max_size, "ammo")
+	if count > 0 then
+		local loaded = fill4me.loadAmmoInto(entity, ammo.name, count)
+		if loaded > 0 then
+			fill4me.textRemove(player, entity, ammo.i18n, loaded)
+			if loaded < count then
+				fill4me.loadInto(player, ammo.name, count - loaded)
+			end
+			return true
+		else
+			fill4me.returnToInventory(player, ammo.name, count, "ammo")
+		end
+	end
+	return false
+end
+
 function fill4me.load_ammo(entity, lent, plidx)
 	local player = game.get_player(plidx)
 	local pldata = fill4me.player(plidx)
@@ -222,15 +251,7 @@ function fill4me.load_ammo(entity, lent, plidx)
 	if lent.ammo_category then
 		for _, ammo in pairs(fill4me.for_player(plidx, "ammos")[lent.ammo_category]) do
 			if ammo_radius_is_ok(proto, ammo, pldata) then
-				local count = fill4me.getFromInventory(player, ammo.name, ammo.max_size, "ammo")
-				if count > 0 then
-					local loaded = fill4me.loadAmmoInto(entity, ammo.name, count)
-					if loaded > 0 then
-						fill4me.textRemove(player, entity, ammo.i18n, loaded)
-					end
-					if loaded < count then
-						fill4me.loadInto(player, ammo.name, count - loaded)
-					end
+				if try_ammo_load(entity, player, ammo) then
 					break
 				end
 			end
@@ -239,20 +260,29 @@ function fill4me.load_ammo(entity, lent, plidx)
 	if lent.guns then
 		for _, gun in pairs(lent.guns) do
 			for _, ammo in pairs(fill4me.for_player(plidx, "ammos")[gun.ammo_category]) do
-				local count = fill4me.getFromInventory(player, ammo.name, ammo.max_size, "ammo")
-				if count > 0 then
-					local loaded = fill4me.loadAmmoInto(entity, ammo.name, count)
-					if loaded > 0 then
-						fill4me.textRemove(player, entity, ammo.i18n, loaded)
-					end
-					if loaded < count then
-						fill4me.loadInto(player, ammo.name, count - loaded)
-					end
+				if try_ammo_load(entity, player, ammo) then
 					break
 				end
 			end
 		end
 	end
+end
+
+local function try_fuel_load(entity, player, fuel)
+	local count = fill4me.getFromInventory(player, fuel.name, fuel.max_size, "fuel")
+	if count > 0 then
+		loaded = fill4me.loadFuelInto(entity, fuel.name, count)
+		if loaded > 0 then
+			fill4me.textRemove(player, entity, fuel.i18n, loaded)
+			if loaded < count then
+				fill4me.loadInto(player, fuel.name, count - loaded)
+			end
+			return true
+		else
+			fill4me.returnToInventory(player, fuel.name, count, "fuel")
+		end
+	end
+	return false
 end
 
 function fill4me.load_fuel(entity, lent, plidx)
@@ -261,15 +291,7 @@ function fill4me.load_fuel(entity, lent, plidx)
 	local found_fuel = false
 	for name, t in pairs(lent.fuel_categories) do
 		for _, fuel in pairs(fill4me.for_player(plidx, "fuels")[name]) do
-			local count = fill4me.getFromInventory(player, fuel.name, fuel.max_size, "fuel")
-			if count > 0 then
-				loaded = fill4me.loadFuelInto(entity, fuel.name, count)
-				if loaded > 0 then
-					fill4me.textRemove(player, entity, fuel.i18n, loaded)
-				end
-				if loaded < count then
-					fill4me.loadInto(player, fuel.name, count - loaded)
-				end
+			if try_fuel_load(entity, player, fuel) then
 				found_fuel = true
 				break
 			end

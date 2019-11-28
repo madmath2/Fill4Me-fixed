@@ -1,0 +1,8 @@
+data:extend{
+    {
+        type = "custom-input",
+        name = "fill4me-keybind-reload",
+        key_sequence = "CONTROL + R",
+        consuming = "game-only",
+    }
+}

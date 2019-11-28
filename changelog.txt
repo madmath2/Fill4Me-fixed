@@ -1,4 +1,17 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.7.1
+Date: Sep 19, 2019
+  Changes:
+    - Fix loading of Factorio's own 'production-score' lib file.  This is used to help calculate the order/value of items such as poison-capsule & poison-cloud, as they aren't (or weren't, and I haven't checked yet) properly calculatable regarding their damage.
+
+---------------------------------------------------------------------------------------------------
+Version: 0.7.0
+Date: Sep 14, 2019
+  Changes:
+    - Add list of fuel types via /f4m.list_fuel (per-player) and /f4m.list_all_fuel (everything available)
+    - Add ability to (per-player) exclude/include fuels into the auto-fill list via /f4m.exclude and /f4m.include
+
+---------------------------------------------------------------------------------------------------
 Version: 0.6.0
 Date: Apr 29, 2019
   Changes:
