@@ -36,12 +36,11 @@ require 'lib/event_extend'
 f4m_keybind = {}
 
 function f4m_keybind.re_up(event)
-    -- Get entity under cursor, identify 
-    game.print("Got reload event from player")
+    -- Get entity under cursor, then try and load it.
     local player = game.get_player(event.player_index)
     local entity = player.selected
     if entity then
-        game.print("Found entity: " .. entity.name)
+        -- This is copied from fill4me.lua, and violates DRY.
         local pldata = fill4me.player(event.player_index)
 		local lent = fill4me.for_player(pldata, "loadable_entities")[entity.name]
 		if lent then
@@ -55,4 +54,9 @@ function f4m_keybind.re_up(event)
     end
 end
 
+function f4m_keybind.enable(event)
+	fill4me.toggle(event.player_index)
+end
+
 script.on_event("fill4me-keybind-reload", f4m_keybind.re_up)
+script.on_event("fill4me-keybind-enable", f4m_keybind.enable)
