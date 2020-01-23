@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.9.0
+Date: Jan 22, 2020
+  Changes:
+    - Update for Factorio 0.18 (barely).  Have not encountered weapons with multiple ammo categories yet, so the selection logic between *types* of ammo will be naive.
+
+---------------------------------------------------------------------------------------------------
 Version: 0.8.1
 Date: Nov 28, 2019
   Changes:

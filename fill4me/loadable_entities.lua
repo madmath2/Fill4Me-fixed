@@ -43,17 +43,17 @@ function LoadEnts.list_of_fireables()
 		local edata = {
 			name = name,
 		}
-		if proto.attack_parameters and proto.attack_parameters.ammo_category then
+		if proto.attack_parameters and proto.attack_parameters.ammo_categories then
 			loadable = true
 			edata.direct = true
-			edata.ammo_category = proto.attack_parameters.ammo_category
+			edata.ammo_categories = proto.attack_parameters.ammo_categories
 		end
 		if proto.guns then
 			for type, gunproto in pairs(proto.guns) do
-				if gunproto.attack_parameters.ammo_category then
+				if gunproto.attack_parameters.ammo_categories then
 					local gundata = {
 						name = gunproto.name,
-						ammo_category = gunproto.attack_parameters.ammo_category,
+						ammo_categories = gunproto.attack_parameters.ammo_categories,
 					}
 					if not edata.guns then
 						loadable = true

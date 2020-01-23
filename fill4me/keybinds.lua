@@ -47,7 +47,7 @@ function f4m_keybind.re_up(event)
 			if lent.fuel_categories then
 				fill4me.load_fuel(entity, lent, event.player_index)
 			end
-			if lent.guns or lent.ammo_category then
+			if lent.guns or lent.ammo_categories then
 				fill4me.load_ammo(entity, lent, event.player_index)
 			end
 		end

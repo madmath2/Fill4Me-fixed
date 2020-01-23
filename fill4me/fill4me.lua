@@ -121,7 +121,7 @@ function fill4me.built_entity(event)
 			if lent.fuel_categories then
 				fill4me.load_fuel(entity, lent, event.player_index)
 			end
-			if lent.guns or lent.ammo_category then
+			if lent.guns or lent.ammo_categories then
 				fill4me.load_ammo(entity, lent, event.player_index)
 			end
 		end
@@ -255,20 +255,24 @@ function fill4me.load_ammo(entity, lent, plidx)
 	local player = game.get_player(plidx)
 	local pldata = fill4me.player(plidx)
 	local proto = game.entity_prototypes[entity.name]
-	if lent.ammo_category then
-		for _, ammo in pairs(fill4me.for_player(plidx, "ammos")[lent.ammo_category]) do
-			if ammo_radius_is_ok(proto, ammo, pldata) then
-				if try_ammo_load(entity, player, ammo) then
-					break
+	if lent.ammo_categories then
+		for _, category in pairs(lent.ammo_categories) do
+			for _, ammo in pairs(fill4me.for_player(plidx, "ammos")[category]) do
+				if ammo_radius_is_ok(proto, ammo, pldata) then
+					if try_ammo_load(entity, player, ammo) then
+						break
+					end
 				end
 			end
 		end
 	end
 	if lent.guns then
 		for _, gun in pairs(lent.guns) do
-			for _, ammo in pairs(fill4me.for_player(plidx, "ammos")[gun.ammo_category]) do
-				if try_ammo_load(entity, player, ammo) then
-					break
+			for _, category in pairs(gun.ammo_categories) do
+				for _, ammo in pairs(fill4me.for_player(plidx, "ammos")[category]) do
+					if try_ammo_load(entity, player, ammo) then
+						break
+					end
 				end
 			end
 		end
