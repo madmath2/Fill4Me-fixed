@@ -103,7 +103,7 @@ end
 
 -- removes a button from the upper-left corner "toolbar"
 function kw_delToolbarButton(player, buttonName)
-	local container = (player)
+	local container = mod_gui.get_button_flow(player)
 	if container[buttonName] then
 		container[buttonName].destroy()
 	end
