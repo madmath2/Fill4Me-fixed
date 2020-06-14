@@ -32,6 +32,9 @@ Functionality related to the handling of Ammo for Fill4Me.
 
 Ammo = {}
 
+-- for production_score.generate_price_list()
+production_score = require 'production-score'
+
 -- 
 -- General-purpose Ammo functions (the ones you probably want to call)
 -- 

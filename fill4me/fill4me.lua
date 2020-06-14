@@ -52,7 +52,6 @@ require 'fill4me/loadable_entities'
 -- which prevents being able to identify the base damage of things like 
 -- poison-capsule (item) / poison-cloud (entity)
 require 'util' -- needed by 'production-score' (below)
-require 'production-score' -- for production_score.generate_price_list()
 
 fill4me = {}
 
