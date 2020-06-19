@@ -469,7 +469,7 @@ function fill4me.toggle(plidx)
 	local player = game.get_player(plidx)
 	pldata.enable = not pldata.enable
 	
-	fill4me_guib.reset_button_sprite_for(plidx)
+	--fill4me_guib.reset_button_sprite_for(plidx)
 
 	if pldata.enable then
 		player.print({'fill4me.prefix', {'fill4me.enabled'} })
