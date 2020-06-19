@@ -1,8 +1,14 @@
 ---------------------------------------------------------------------------------------------------
-Version: 0.9.2
+Version: 0.9.3
 Date: Jun 18, 2020
   Changes:
     - Remove GUI button.  Revision needed to make this work after the lua changes in Factorio 0.18.30.
+
+---------------------------------------------------------------------------------------------------
+Version: 0.9.2
+Date: Feb 26, 2020
+  Changes:
+    - Update to use Factorio's updated 'production-score' code.
 
 ---------------------------------------------------------------------------------------------------
 Version: 0.9.1
