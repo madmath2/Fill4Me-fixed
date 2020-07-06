@@ -35,7 +35,7 @@ require 'lib/fb_util'
 fill4me_cmd = {}
 
 function fill4me_cmd.exclude(event)
-	local player = game.players[event.player_index]
+	local player = playerFromIndex(event.player_index)
 	local f4mplayer = fill4me.player(player.index)
 	if event.parameter then
 		local fuel_list = fill4me.for_player(player.index, "fuels")
@@ -62,7 +62,7 @@ function fill4me_cmd.exclude(event)
 end
 
 function fill4me_cmd.include(event)
-	local player = game.players[event.player_index]
+	local player = playerFromIndex(event.player_index)
 	local f4mplayer = fill4me.player(player.index)
 	if event.parameter then
 		local fuel_list = global.fill4me.fuels
@@ -91,7 +91,7 @@ function fill4me_cmd.include(event)
 			table.insert(player_fuel_list, table.deepcopy(fuel_to_add))
 			table.sort(player_fuel_list, fill4me.fuel_sort_high)
 		end
-		player.print({'fill4me.cmd.include.including', fuel_to_add.i18n})
+		player.print({'fill4me.cmd.include_fuel.including', fuel_to_add.i18n})
 	else
 		-- display error
 		player.print({'fill4me.prefix', {'fill4me.cmd.error_in_command'}})
@@ -101,7 +101,7 @@ function fill4me_cmd.include(event)
 end
 
 function fill4me_cmd.max_percent(event)
-	local player = game.players[event.player_index]
+	local player = playerFromIndex(event.player_index)
 	if event.parameter then
 		local percent = tonumber(event.parameter)
 		if percent and percent > 0 and percent <= 100 then
@@ -249,7 +249,7 @@ function fill4me_cmd.debug_player(event)
 	print(serpent.line(pldata))
 end
 
-if true == false then -- DEBUG functionality.
+if true == true then -- DEBUG functionality.
 	commands.add_command('f4m.debug', '', fill4me_cmd.debug)
 	commands.add_command('f4m.debug.ammo', '', fill4me_cmd.debug_ammo_type)
 	commands.add_command('f4m.debug.fuel', '', fill4me_cmd.debug_fuel_type)

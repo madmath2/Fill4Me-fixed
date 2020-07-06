@@ -65,18 +65,11 @@ data:extend({
 	-- blacklist settings
 	--
 	{
-		type = "string-setting",
-		name = "fill4me-blacklist",
-		setting_type = "runtime-per-user",
-		default_value = "true",
-		allowed_values = {"true"},
-		order = "fill4me-1",
-	},
-	{
-		type = "string-setting",
 		name = "fill4me-blacklist-fuel",
+		type = "string-setting",
+		allow_blank = true,
 		setting_type = "runtime-per-user",
-		default_value = "small-electric-pole",
+		default_value = "",
 		order = "fill4me-2",
 	},
 	--[[

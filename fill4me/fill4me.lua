@@ -109,6 +109,36 @@ function fill4me.reset_players_loadables()
 	game.print({'fill4me.prefix', {'fill4me.players_reset'}})
 end
 
+-- split string by comma (ignores whitespace) to table/list
+local function csv_string_to_list(str)
+	items = {}
+	for item in string.gmatch(str,'[^,%s]+') do
+		table.insert(items,item)
+	end
+	return items
+end
+--Function to apply blacklist settings to current player
+function fill4me.load_blacklist(plidx)
+	-- Reset player F4M filters; get new list; add individually to exclude list.
+	local player = playerFromIndex(plidx)
+	local exclusion_fuel = csv_string_to_list(player.mod_settings["fill4me-blacklist-fuel"].value)
+	local event = { player_index = plidx }
+	fill4me_cmd.reset_me(event)
+	
+	for _, fuel in pairs(exclusion_fuel) do
+		event.parameter = fuel
+		fill4me_cmd.exclude(event)
+	end
+	-- Concept to do the same for ammo, but there's no fill4me_cmd for it yet.
+	--[[
+	local exclusion_ammo = csv_string_to_list(player.mod_settings["fill4me-blacklist-ammo"].value)
+	for _, ammo in pairs(exclusion_ammo) do
+		new_event.parameter = ammo
+		fill4me_cmd.exclude(new_event)
+	end
+	]]--
+end
+
 -- Entity built by player.  Evaluate for inserting fuel & ammo.
 function fill4me.built_entity(event)
 	local pldata = fill4me.player(event.player_index)
@@ -365,6 +395,7 @@ function fill4me.loadModPlayerSettings(plidx, pldata)
 		if gmps["fill4me-ammo-load-limit"].value == "count" then
 			pldata.max_ammo_load_percent = 100
 		end
+		fill4me.load_blacklist(plidx)
 	end
 end
 
