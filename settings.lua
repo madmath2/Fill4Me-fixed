@@ -61,4 +61,31 @@ data:extend({
 		maximum_value = 200,
 		order = "ammo-load-3",
 	},
+	--
+	-- blacklist settings
+	--
+	{
+		type = "string-setting",
+		name = "fill4me-blacklist",
+		setting_type = "runtime-per-user",
+		default_value = "true",
+		allowed_values = {"true"},
+		order = "fill4me-1",
+	},
+	{
+		type = "string-setting",
+		name = "fill4me-blacklist-fuel",
+		setting_type = "runtime-per-user",
+		default_value = "small-electric-pole",
+		order = "fill4me-2",
+	},
+	--[[
+	{
+		type = "string-setting",
+		name = "fill4me-blacklist-ammo",
+		setting_type = "runtime-per-user",
+		default_value = " ",
+		order = "fill4me-3",
+	},
+	]]--
 })

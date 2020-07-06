@@ -23,14 +23,47 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
 ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-	
-	Fill 4 Me
 
-Fill 4 Me is a Factorio mod to automatically insert fuel and/or ammunition 
-into entities when you place them.
+	blacklist.lua
+
+Commands for Fill4Me.  (Precursor to a UI)
 
 --]]
 
-require 'lib/kwidgets'
-require 'fill4me/init'
-require 'fill4me/blacklist'
+--Not sure if I needed to add that copyright thing to this page, but better safe than sorry.
+
+--Simple function to split string by comma (ignores comma and whitespace)
+local function split(str)
+	items = {}
+	for item in string.gmatch(str,'[^,%s]+') do
+		table.insert(items,item)
+	end
+	return items
+end
+
+--Function to apply blacklist settings to current player
+local function fill4meBlacklist(event)
+	--Reset the current list if people removed items from list
+	fill4me_cmd.reset_me(event)
+	--Make a local copy of the current event, current player, and blacklist settings
+	local new_event = table.deepcopy(event)
+	local player = game.players[event.player_index]
+	--Make sure to split the string format of the setting into several strings in a table
+	local exclusion_fuel = split(player.mod_settings["fill4me-blacklist-fuel"].value)
+	--local exclusion_ammo = split(player.mod_settings["fill4me-blacklist-ammo"].value)
+	--Also why isn't there an ammo variation of the exclusion command?
+	
+	--Run the exclusion command for every fuel item in the list
+	for _, fuel in pairs(exclusion_fuel) do
+		new_event.parameter = fuel
+		fill4me_cmd.exclude(new_event)
+	end
+end
+
+
+--Shortcut button that calls the above script
+script.on_event(defines.events.on_lua_shortcut, function(event)
+	if event.prototype_name == "fill4me-blacklist-button" then
+		fill4meBlacklist(event)
+	end
+end)
