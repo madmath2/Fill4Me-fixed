@@ -249,7 +249,7 @@ function fill4me_cmd.debug_player(event)
 	print(serpent.line(pldata))
 end
 
-if true == true then -- DEBUG functionality.
+if true == false then -- DEBUG functionality.
 	commands.add_command('f4m.debug', '', fill4me_cmd.debug)
 	commands.add_command('f4m.debug.ammo', '', fill4me_cmd.debug_ammo_type)
 	commands.add_command('f4m.debug.fuel', '', fill4me_cmd.debug_fuel_type)
