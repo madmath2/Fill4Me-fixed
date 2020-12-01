@@ -1,4 +1,12 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.9.5
+Date: Nov 30, 2020
+  Changes:
+    - Updated info to say it works on 1.1.
+    - Fixed a crash (and text display oddity) regarding reloading turrets when never having placed a turret while Fill4Me is loaded.
+    - Fixed (sorta tested) an issue with the mod reloading player settings when [other] mods change (or update).
+
+---------------------------------------------------------------------------------------------------
 Version: 0.9.4
 Date: Jun 26, 2020
   Features:
