@@ -105,6 +105,7 @@ function fill4me.reset_players_loadables()
 	local f4mdata = global.fill4me
 	for idx, pldata in pairs(f4mdata.players) do
 		fill4me.reset_player_lists(idx)
+		fill4me.loadModPlayerSettings(idx)
 	end
 	game.print({'fill4me.prefix', {'fill4me.players_reset'}})
 end
