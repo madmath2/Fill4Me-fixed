@@ -143,7 +143,6 @@ end
 function fill4me.built_entity(event)
 	local pldata = fill4me.player(event.player_index)
 	if pldata.enable and event.created_entity.valid then
-		pldata.ft_offset = 0
 		local entity = event.created_entity
 		local lent = fill4me.for_player(pldata, "loadable_entities")[entity.name]
 		if lent then
@@ -483,8 +482,8 @@ end
 function fill4me.textRemove(player, entity, item_name, quantity, color)
 	local pos = entity.position
 	local pldata = fill4me.player(player.index)
-	pos.x = pos.x + 1
-	pos.y = pos.y + pldata.ft_offset
+	pos.x = pos.x + 0.75
+	pos.y = pos.y - 0.5
 	local textcolor = color or {r=1, g=1, b=1, a=1}
 	player.surface.create_entity({ 
 		name = "flying-text",
@@ -492,7 +491,6 @@ function fill4me.textRemove(player, entity, item_name, quantity, color)
 		position = pos,
 		text = {'fill4me.removed', quantity, item_name},
 	})
-	pldata.ft_offset = pldata.ft_offset + 1
 end
 
 function fill4me.toggle(plidx)
