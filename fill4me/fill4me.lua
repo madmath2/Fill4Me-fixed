@@ -509,6 +509,12 @@ function fill4me.toggle(plidx)
 	return pldata.enable
 end
 
+function fill4me.on_lua_shortcut(event)
+	if event.prototype_name == "fill4me-shortcut-toggle" then
+		fill4me.toggle(event.player_index)
+	end
+end
+
 function fill4me.set_ignore_ammo_radius(plidx, set_to)
 	local player = game.get_player(plidx)
 	local pldata = fill4me.player(plidx)
@@ -530,3 +536,4 @@ Event.register(defines.events.on_runtime_mod_setting_changed, fill4me.runtimeMod
 Event.register(defines.events.on_built_entity, fill4me.built_entity)
 Event.register(defines.events.script_raised_built, fill4me.script_built_entity)
 Event.register(defines.events.on_player_created, fill4me.initPlayer)
+Event.register(defines.events.on_lua_shortcut, fill4me.on_lua_shortcut)
