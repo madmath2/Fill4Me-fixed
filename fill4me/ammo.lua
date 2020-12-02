@@ -55,8 +55,8 @@ function Ammo.list()
 		-- evaluate ammunition items
 		local ammotype = proto.get_ammo_type()
 		if ammotype and ammotype.action then
-			local damage = Ammo.damage_from_actions(ammotype.action)
-			local radius = Ammo.radius_from_actions(ammotype.action)
+			local damage = Ammo.damage_from_actions(ammotype.action, {})
+			local radius = Ammo.radius_from_actions(ammotype.action, {})
 			local data = {
 				name = proto.name,
 				category = ammotype.category,
@@ -88,7 +88,7 @@ end
 --
 -- Damage
 --
-function Ammo.damage_from_action(action)
+function Ammo.damage_from_action(action, stack_names)
 	local damage = 0
 	if action.action_delivery then
 		for _, ad in pairs(action.action_delivery) do
@@ -96,54 +96,65 @@ function Ammo.damage_from_action(action)
 			if action.radius then
 				multiplier = action.radius * action.radius * math.pi
 			end
-			damage = damage + Ammo.delivery_damage(ad) * multiplier
+			damage = damage + Ammo.delivery_damage(ad, stack_names) * multiplier
 		end
 	end
 	return damage
 end
 
-function Ammo.damage_from_actions(actionset)
+function Ammo.damage_from_actions(actionset, stack_names)
+
 	local damage = 0
 	for _, act in pairs(actionset) do
-		damage = damage + Ammo.damage_from_action(act) * act.repeat_count
+		damage = damage + Ammo.damage_from_action(act, stack_names) * act.repeat_count
 	end
 	return damage
 end
 
-function Ammo.entity_attack_damage(entity_name)
+function Ammo.entity_attack_damage(entity_name, stack_names)
+	-- before adding this to the result, check that it's not a repeating entity.
+	-- Note, clone the table, as we can encounter the same effect down the
+	-- multiple effects that an entity can have.
+	-- Space Exploration has plague loop (rocket -> cloud -> wave -> cloud -> wave)
+	if arr_contains(stack_names, entity_name) then
+		game.print({"fill4me.loop_in_ammo_damage_calc", stack_names[1]})
+		return 0
+	end
+	table.insert(stack_names, entity_name)
+
 	local ent = game.entity_prototypes[entity_name]
 	local damage = 0
 	if ent then
 		if ent.attack_result then
-			damage = damage + Ammo.damage_from_actions(ent.attack_result)
+			damage = damage + Ammo.damage_from_actions(ent.attack_result, {table.unpack(stack_names)})
 		end
 		if ent.final_attack_result then
-			damage = damage + Ammo.damage_from_actions(ent.final_attack_result)
+			damage = damage + Ammo.damage_from_actions(ent.final_attack_result, {table.unpack(stack_names)})
 		end
 	end
 	return damage
 end
 
-function Ammo.delivery_damage(ad)
+function Ammo.delivery_damage(ad, stack_names)
 	damage = 0
 	if ad.type == 'instant' then
 		if ad.target_effects then
 			for _, te in pairs(ad.target_effects) do
 				if te.action then
-					damage = damage + Ammo.damage_from_actions(te.action)
+					damage = damage + Ammo.damage_from_actions(te.action, stack_names)
 				end
 				if te.type == 'damage' then
 					damage = damage + te.damage.amount
 				end
 				if te.type == 'create-entity' and te.entity_name then
-					damage = damage + Ammo.entity_attack_damage(te.entity_name)
+					damage = damage + Ammo.entity_attack_damage(te.entity_name, stack_names)
 				end
 			end
 		end
 	elseif ad.projectile then
-		damage = damage + Ammo.entity_attack_damage(ad.projectile)
+		damage = damage + Ammo.entity_attack_damage(ad.projectile, stack_names)
 	elseif ad.stream then
-		damage = damage + Ammo.entity_attack_damage(ad.stream)
+		damage = damage + Ammo.entity_attack_damage(ad.stream, stack_names)
 	end
 	return damage
 end
@@ -151,42 +162,52 @@ end
 --
 -- Radius
 --
-function Ammo.radius_from_action(action)
+function Ammo.radius_from_action(action, stack_names)
 	local radius = 0
 	if action.action_delivery then
 		for _, actdelivery in pairs(action.action_delivery) do
 			if action.radius then
 				radius = action.radius
 			end
-			radius = radius + Ammo.radius_of_delivery(actdelivery)
+			radius = radius + Ammo.radius_of_delivery(actdelivery, stack_names)
 		end
 	end
 	return radius
 end
 
-function Ammo.radius_from_actions(actionset)
+function Ammo.radius_from_actions(actionset, stack_names)
 	local radius = 0
 	for _, act in pairs(actionset) do
-		radius = radius + Ammo.radius_from_action(act)
+		radius = radius + Ammo.radius_from_action(act, stack_names)
 	end
 	return radius
 end
 
-function Ammo.radius_from_entity(entity_name)
+function Ammo.radius_from_entity(entity_name, stack_names)
+	-- before adding this to the result, check that it's not
+	-- a repeating entry of one we've done.
+	-- Space Exploration does this with plague
+	-- (rocket -> cloud -> wave -> cloud -> wave)
+	if arr_contains(stack_names, entity_name) then
+		game.print({"fill4me.loop_in_ammo_radius_calc", stack_names[1]})
+		return 0
+	end
+	table.insert(stack_names, entity_name)
+
 	local ent = game.entity_prototypes[entity_name]
 	local radius = 0
 	if ent then
 		if ent.attack_result then
-			radius = radius + Ammo.radius_from_actions(ent.attack_result)
+			radius = radius + Ammo.radius_from_actions(ent.attack_result, {table.unpack(stack_names)})
 		end
 		if ent.final_attack_result then
-			radius = radius + Ammo.radius_from_actions(ent.final_attack_result)
+			radius = radius + Ammo.radius_from_actions(ent.final_attack_result, {table.unpack(stack_names)})
 		end
 	end
 	return radius
 end
 
-function Ammo.radius_of_delivery(adelivery)
+function Ammo.radius_of_delivery(adelivery, stack_names)
 	radius = 0
 	if adelivery.type == 'instant' then
 		if adelivery.target_effects then
@@ -195,14 +216,14 @@ function Ammo.radius_of_delivery(adelivery)
 					if te.action.radius then
 						radius = radius + te.action.radius
 					end
-					radius = radius + Ammo.radius_from_actions(te.action)
+					radius = radius + Ammo.radius_from_actions(te.action, stack_names)
 				end
 			end
 		end
 	elseif adelivery.projectile then
-		radius = radius + Ammo.radius_from_entity(adelivery.projectile)
+		radius = radius + Ammo.radius_from_entity(adelivery.projectile, stack_names)
 	elseif adelivery.stream then
-		radius = radius + Ammo.radius_from_entity(adelivery.stream)
+		radius = radius + Ammo.radius_from_entity(adelivery.stream, stack_names)
 	end
 	return radius
 end

@@ -256,4 +256,5 @@ if true == false then -- DEBUG functionality.
 	commands.add_command('f4m.debug.entity', '', fill4me_cmd.debug_entity)
 	commands.add_command('f4m.debug.global', '', fill4me_cmd.debug_global)
 	commands.add_command('f4m.debug.player', '', fill4me_cmd.debug_player)
+	commands.add_command('f4m.debug.reinit', '', fill4me.reInitMod)
 end
