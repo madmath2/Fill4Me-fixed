@@ -31,5 +31,4 @@ into entities when you place them.
 
 --]]
 
-require 'lib/kwidgets'
 require 'fill4me/init'
