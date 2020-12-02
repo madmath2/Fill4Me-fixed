@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.10.0
+Date: Dec 2, 2020
+  Changes:
+    - Added Shortcut Bar button for Toggling Fill4Me On & Off.
+    - Added loop detection to Ammo damage effects (creating entity 1 which creates entity 2 which creates entity 1 and so on).
+
+---------------------------------------------------------------------------------------------------
 Version: 0.9.5
 Date: Nov 30, 2020
   Changes:
