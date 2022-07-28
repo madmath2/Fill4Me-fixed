@@ -2,7 +2,7 @@
 
 ## Forked to fix issues
 
-Original mod by [kovys](https://mods.factorio.com/user/kovus) available [here](https://mods.factorio.com/mod/Fill4Me). All credits for the awesome work should go to kovus.
+Original mod by [kovus](https://mods.factorio.com/user/kovus) available [here](https://mods.factorio.com/mod/Fill4Me). All credits for the awesome work should go to kovus.
 
 This version only adds [this fix](https://gitlab.com/FishBus/Fill4Me/-/merge_requests/10) for an annoying error log, but is otherwise identical to the original mod.
 
