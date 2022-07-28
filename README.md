@@ -1,5 +1,15 @@
 # Fill4Me
 
+## Forked to fix issues
+
+Original mod by [kovys](https://mods.factorio.com/user/kovus) available [here](https://mods.factorio.com/mod/Fill4Me). All credits for the awesome work should go to kovus.
+
+This version only adds [this fix](https://gitlab.com/FishBus/Fill4Me/-/merge_requests/10) for an annoying error log, but is otherwise identical to the original mod.
+
+----------
+
+## Original description
+
 Fill 4 Me is a Factorio mod to automatically insert fuel and/or ammunition into entities when you place them.
 
 Fill4Me is ready to work with other mods, and automatically determines at load time what the best ammunition & fuels are for entities.  It will re-evaluate these decisions when new mods are loaded or mods are unloaded, ensuring that you put the best ammunition or fuels you have on-hand into your entities, including custom fuels and ammunition.  Entities which have multiple ammunition types will have some of each type loaded into them.

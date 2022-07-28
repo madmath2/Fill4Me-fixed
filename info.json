@@ -1,12 +1,12 @@
 {
-    "name": "Fill4Me",
-    "version": "0.10.0",
+    "name": "Fill4Me-fixed",
+    "version": "0.10.1",
     "title": "Fill4Me",
-    "author": "Kovus",
-    "contact": "kovus@soulless.wtf",
-    "homepage": "https://gitlab.com/FishBus/Fill4Me",
+    "author": "madmath",
+    "contact": "Discord: madmath#3962",
+    "homepage": "https://github.com/madmath2/Fill4Me-fixed",
 	"license": "BSD 3-clause",
     "factorio_version": "1.1",
     "dependencies": ["base >= 1.1"],
-    "description": "Fill 4 Me is a Factorio mod to automatically insert fuel and/or ammunition into entities when you place them."
+    "description": "A Factorio mod to automatically insert fuel and/or ammunition into entities when you place them. Forked to fix error logs."
 }

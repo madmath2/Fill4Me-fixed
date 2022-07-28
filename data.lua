@@ -20,14 +20,14 @@ data:extend{
         toggleable = "true",
         localised_name = {"fill4me.gui.enable_button"},
         icon = {
-            filename = "__Fill4Me__/images/fill4me-32.png",
+            filename = "__Fill4Me-fixed__/images/fill4me-32.png",
             priority = "extra-high",
             size = 32,
             scale = 1,
             flags = {"icon"}
         },
         small_icon = {
-            filename = "__Fill4Me__/images/fill4me-24.png",
+            filename = "__Fill4Me-fixed__/images/fill4me-24.png",
             priority = "extra-high",
             size = 24,
             scale = 1,
